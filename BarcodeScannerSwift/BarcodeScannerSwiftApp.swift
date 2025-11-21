@@ -1,18 +1,12 @@
-//
-//  BarcodeScannerSwiftApp.swift
-//  BarcodeScannerSwift
-//
-//  Created by Julian Regueira on 20/11/25.
-//
-
 import SwiftUI
 import SwiftData
 
 @main
 struct BarcodeScannerSwiftApp: App {
+    // Contenedor de SwiftData (Base de datos)
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            BarcodeItem.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -25,7 +19,38 @@ struct BarcodeScannerSwiftApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            TabView {
+                // --- FEATURE: HISTORY ---
+                // Composition Root (DI Manual)
+                // 1. Data Layer
+                let context = sharedModelContainer.mainContext
+                let historyRepository = BarcodeRepositoryImpl(modelContext: context)
+                
+                // 2. Domain Layer (UseCases)
+                let getHistoryUseCase = GetHistoryUseCaseImpl(repository: historyRepository)
+                let deleteBarcodeUseCase = DeleteBarcodeUseCaseImpl(repository: historyRepository)
+                let saveBarcodeUseCase = SaveBarcodeUseCaseImpl(repository: historyRepository)
+                
+                // 3. Presentation Layer (ViewModel)
+                let historyViewModel = HistoryViewModel(
+                    getHistoryUseCase: getHistoryUseCase,
+                    deleteBarcodeUseCase: deleteBarcodeUseCase,
+                    saveBarcodeUseCase: saveBarcodeUseCase
+                )
+                
+                HistoryView(viewModel: historyViewModel)
+                    .tabItem {
+                        Label("Historial", systemImage: "list.bullet")
+                    }
+                
+                // --- MODULE: SCANNER ---
+                let scannerViewModel = ScannerViewModel()
+                
+                ScannerView(viewModel: scannerViewModel)
+                    .tabItem {
+                        Label("Escanear", systemImage: "qrcode.viewfinder")
+                    }
+            }
         }
         .modelContainer(sharedModelContainer)
     }
