@@ -11,5 +11,10 @@ import Observation
 @Observable
 class ScannerViewModel {
     
-
+    // DEPENDENCIAS
+    private let saveBarcodeUseCase: SaveBarcodeUseCase
+    
+    init(saveBarcodeUseCase: SaveBarcodeUseCase) {
+        self.saveBarcodeUseCase = saveBarcodeUseCase
+    }
 }

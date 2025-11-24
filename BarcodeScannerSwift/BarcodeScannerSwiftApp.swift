@@ -3,55 +3,27 @@ import SwiftData
 
 @main
 struct BarcodeScannerSwiftApp: App {
-    // Contenedor de SwiftData (Base de datos)
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            BarcodeItem.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
+    // Inicializamos el contenedor de dependencias (que a su vez inicia SwiftData)
+    @State private var appDIContainer = AppDIContainer()
 
     var body: some Scene {
         WindowGroup {
             TabView {
                 // --- FEATURE: HISTORY ---
-                // Composition Root (DI Manual)
-                // 1. Data Layer
-                let context = sharedModelContainer.mainContext
-                let historyRepository = BarcodeRepositoryImpl(modelContext: context)
-                
-                // 2. Domain Layer (UseCases)
-                let getHistoryUseCase = GetHistoryUseCaseImpl(repository: historyRepository)
-                let deleteBarcodeUseCase = DeleteBarcodeUseCaseImpl(repository: historyRepository)
-                let saveBarcodeUseCase = SaveBarcodeUseCaseImpl(repository: historyRepository)
-                
-                // 3. Presentation Layer (ViewModel)
-                let historyViewModel = HistoryViewModel(
-                    getHistoryUseCase: getHistoryUseCase,
-                    deleteBarcodeUseCase: deleteBarcodeUseCase,
-                    saveBarcodeUseCase: saveBarcodeUseCase
-                )
-                
-                HistoryView(viewModel: historyViewModel)
+                // Usamos el Factory del Container
+                HistoryView(viewModel: appDIContainer.makeHistoryViewModel())
                     .tabItem {
                         Label("Historial", systemImage: "list.bullet")
                     }
                 
                 // --- MODULE: SCANNER ---
-                let scannerViewModel = ScannerViewModel()
-                
-                ScannerView(viewModel: scannerViewModel)
+                ScannerView(viewModel: appDIContainer.makeScannerViewModel())
                     .tabItem {
                         Label("Escanear", systemImage: "qrcode.viewfinder")
                     }
             }
         }
-        .modelContainer(sharedModelContainer)
+        // Inyectamos el ModelContainer de SwiftData al entorno por si alguna View lo usa con @Query
+        .modelContainer(appDIContainer.sharedModelContainer)
     }
 }
