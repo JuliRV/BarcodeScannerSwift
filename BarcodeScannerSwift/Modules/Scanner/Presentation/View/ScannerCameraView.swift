@@ -4,6 +4,7 @@ import AVFoundation
 struct ScannerCameraView: UIViewRepresentable {
     var onScanned: (String, String) -> Void
     @Binding var errorMessage: String?
+    @Binding var isActive: Bool
     
     func makeCoordinator() -> Coordinator {
         Coordinator(parent: self)
@@ -16,7 +17,12 @@ struct ScannerCameraView: UIViewRepresentable {
     }
     
     func updateUIView(_ uiView: CameraPreviewView, context: Context) {
-        // Updates if needed
+        // Controlar la sesión según isActive
+        if isActive {
+            context.coordinator.startSession()
+        } else {
+            context.coordinator.stopSession()
+        }
     }
     
     class Coordinator: NSObject, AVCaptureMetadataOutputObjectsDelegate {
@@ -102,9 +108,27 @@ struct ScannerCameraView: UIViewRepresentable {
             view.previewLayer = previewLayer
             view.boundingBoxLayer = shapeLayer
             
-            // Iniciar sesión en background
+            // Iniciar sesión si está activa
+            if parent.isActive {
+                startSession()
+            }
+        }
+        
+        func startSession() {
+            guard let session = captureSession, !session.isRunning else { return }
             DispatchQueue.global(qos: .userInitiated).async {
                 session.startRunning()
+            }
+        }
+        
+        func stopSession() {
+            guard let session = captureSession, session.isRunning else { return }
+            DispatchQueue.global(qos: .userInitiated).async {
+                session.stopRunning()
+            }
+            // Limpiar bounding box
+            DispatchQueue.main.async { [weak self] in
+                self?.boundingBoxLayer?.path = nil
             }
         }
         
@@ -128,10 +152,8 @@ struct ScannerCameraView: UIViewRepresentable {
                 let path = UIBezierPath(rect: transformedObject.bounds)
                 boundingBoxLayer?.path = path.cgPath
                 
-                // 3. Enviar código detectado
+                // 3. Enviar código detectado (sin vibración aquí)
                 if let stringValue = metadataObject.stringValue {
-                    // Feedback háptico y notificar
-                    AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
                     parent.onScanned(stringValue, metadataObject.type.rawValue)
                 }
             }

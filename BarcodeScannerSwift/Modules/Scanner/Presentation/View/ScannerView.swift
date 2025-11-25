@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ScannerView: View {
     @State private var viewModel: ScannerViewModel
+    @State private var isActive = false
     
     init(viewModel: ScannerViewModel) {
         self.viewModel = viewModel
@@ -13,7 +14,8 @@ struct ScannerView: View {
                 onScanned: { code, type in
                     viewModel.onCodeDetected(code: code, type: type)
                 },
-                errorMessage: $viewModel.errorMessage
+                errorMessage: $viewModel.errorMessage,
+                isActive: $isActive
             )
             .edgesIgnoringSafeArea(.all)
             
@@ -39,6 +41,12 @@ struct ScannerView: View {
                         .padding(.bottom, 50)
                 }
             }
+        }
+        .onAppear {
+            isActive = true
+        }
+        .onDisappear {
+            isActive = false
         }
     }
 }

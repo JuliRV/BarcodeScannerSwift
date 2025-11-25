@@ -7,6 +7,7 @@
 
 import Foundation
 import Observation
+import AudioToolbox
 
 @Observable
 class ScannerViewModel {
@@ -41,6 +42,8 @@ class ScannerViewModel {
     private func saveCode(code: String, type: String) {
         do {
             try saveBarcodeUseCase.execute(code: code, type: type)
+            // Vibrar SOLO cuando se guarda exitosamente
+            AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
             print("Código guardado: \(code)")
         } catch {
             errorMessage = "Error al guardar: \(error.localizedDescription)"
