@@ -2,7 +2,7 @@ import SwiftUI
 import AVFoundation
 
 struct ScannerCameraView: UIViewRepresentable {
-    @Binding var scannedCode: String?
+    var onScanned: (String, String) -> Void
     @Binding var errorMessage: String?
     
     func makeCoordinator() -> Coordinator {
@@ -128,13 +128,11 @@ struct ScannerCameraView: UIViewRepresentable {
                 let path = UIBezierPath(rect: transformedObject.bounds)
                 boundingBoxLayer?.path = path.cgPath
                 
-                // 3. Enviar código detectado (evitar duplicados rápidos si es necesario)
+                // 3. Enviar código detectado
                 if let stringValue = metadataObject.stringValue {
-                    // Opcional: Feedback háptico
-                    if parent.scannedCode == nil { // Solo notificar si es nuevo o resetear lógica
-                         AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
-                         parent.scannedCode = stringValue
-                    }
+                    // Feedback háptico y notificar
+                    AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+                    parent.onScanned(stringValue, metadataObject.type.rawValue)
                 }
             }
         }

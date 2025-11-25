@@ -9,8 +9,13 @@ struct ScannerView: View {
     
     var body: some View {
         ZStack {
-            ScannerCameraView(scannedCode: $viewModel.scannedCode, errorMessage: $viewModel.errorMessage)
-                .edgesIgnoringSafeArea(.all)
+            ScannerCameraView(
+                onScanned: { code, type in
+                    viewModel.onCodeDetected(code: code, type: type)
+                },
+                errorMessage: $viewModel.errorMessage
+            )
+            .edgesIgnoringSafeArea(.all)
             
             VStack {
                 if let errorMessage = viewModel.errorMessage {
@@ -25,10 +30,11 @@ struct ScannerView: View {
                 Spacer()
                 
                 if let code = viewModel.scannedCode {
-                    Text("Código detectado: \(code)")
+                    Text("Código: \(code)")
                         .font(.headline)
+                        .foregroundColor(.white)
                         .padding()
-                        .background(Color.white)
+                        .background(Color.green.opacity(0.9))
                         .cornerRadius(10)
                         .padding(.bottom, 50)
                 }
