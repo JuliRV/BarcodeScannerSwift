@@ -27,8 +27,11 @@ struct HistoryView: View {
             }
             .navigationTitle("Historial")
             .toolbar {
-                Button(action: viewModel.addMockItem) {
-                    Image(systemName: "plus")
+                Button(action: {
+                    viewModel.clearHistory()
+                }) {
+                    Image(systemName: "trash")
+                        .foregroundColor(.red)
                 }
             }
             .onAppear {

@@ -53,6 +53,12 @@ class ScannerViewModel {
         saveCode(code: code, type: type)
     }
     
+    func submitManualCode(_ code: String) {
+        // Para entrada manual, usamos "Manual" como tipo y aprovechamos la lógica de onCodeDetected
+        // para tener el mismo feedback visual (overlay) y guardado.
+        onCodeDetected(code: code, type: "Manual")
+    }
+    
     private func saveCode(code: String, type: String) {
         do {
             try saveBarcodeUseCase.execute(code: code, type: type)

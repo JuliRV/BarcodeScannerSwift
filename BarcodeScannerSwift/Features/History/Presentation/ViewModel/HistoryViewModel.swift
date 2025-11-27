@@ -10,17 +10,17 @@ class HistoryViewModel {
     // DEPENDENCIAS (UseCases)
     private let getHistoryUseCase: GetHistoryUseCase
     private let deleteBarcodeUseCase: DeleteBarcodeUseCase
-    private let saveBarcodeUseCase: SaveBarcodeUseCase
+    private let clearHistoryUseCase: ClearHistoryUseCase
     
     // Init con inyección de dependencias
     init(
         getHistoryUseCase: GetHistoryUseCase,
         deleteBarcodeUseCase: DeleteBarcodeUseCase,
-        saveBarcodeUseCase: SaveBarcodeUseCase
+        clearHistoryUseCase: ClearHistoryUseCase
     ) {
         self.getHistoryUseCase = getHistoryUseCase
         self.deleteBarcodeUseCase = deleteBarcodeUseCase
-        self.saveBarcodeUseCase = saveBarcodeUseCase
+        self.clearHistoryUseCase = clearHistoryUseCase
     }
     
     // INTENCIONES
@@ -45,12 +45,12 @@ class HistoryViewModel {
         }
     }
     
-    func addMockItem() {
+    func clearHistory() {
         do {
-            try saveBarcodeUseCase.execute(code: "123456", type: "EAN-13")
-            loadHistory() // Recargamos la lista completa
+            try clearHistoryUseCase.execute()
+            items.removeAll()
         } catch {
-            self.errorMessage = "Error guardando: \(error.localizedDescription)"
+            self.errorMessage = "Error borrando historial: \(error.localizedDescription)"
         }
     }
 }

@@ -40,13 +40,17 @@ class AppDIContainer {
         SaveBarcodeUseCaseImpl(repository: barcodeRepository)
     }
     
+    private var clearHistoryUseCase: ClearHistoryUseCase {
+        ClearHistoryUseCase(repository: barcodeRepository)
+    }
+    
     // MARK: - ViewModels Factory Methods
     
     func makeHistoryViewModel() -> HistoryViewModel {
         HistoryViewModel(
             getHistoryUseCase: getHistoryUseCase,
             deleteBarcodeUseCase: deleteBarcodeUseCase,
-            saveBarcodeUseCase: saveBarcodeUseCase
+            clearHistoryUseCase: clearHistoryUseCase
         )
     }
     

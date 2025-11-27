@@ -26,4 +26,8 @@ class BarcodeRepositoryImpl: BarcodeRepository {
     func delete(barcode: BarcodeItem) throws {
         modelContext.delete(barcode)
     }
+    
+    func clearHistory() throws {
+        try modelContext.delete(model: BarcodeItem.self)
+    }
 }

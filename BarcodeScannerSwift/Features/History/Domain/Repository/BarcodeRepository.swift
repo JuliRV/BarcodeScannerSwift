@@ -5,4 +5,5 @@ protocol BarcodeRepository {
     func fetchHistory() throws -> [BarcodeItem]
     func save(barcode: BarcodeItem) throws
     func delete(barcode: BarcodeItem) throws
+    func clearHistory() throws
 }
