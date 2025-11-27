@@ -22,13 +22,27 @@ class ScannerViewModel {
     // PRIVADO
     private var lastScanTime: [String: Date] = [:]
     private let throttleInterval: TimeInterval = 30.0
+    private var overlayResetTask: Task<Void, Never>?
     
     init(saveBarcodeUseCase: SaveBarcodeUseCase) {
         self.saveBarcodeUseCase = saveBarcodeUseCase
     }
     
     func onCodeDetected(code: String, type: String) {
+        // Cancelar tarea de reset anterior si existe
+        overlayResetTask?.cancel()
+        
         self.scannedCode = code
+        
+        // Programar nueva tarea de reset
+        overlayResetTask = Task {
+            try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 segundo
+            if !Task.isCancelled {
+                await MainActor.run {
+                    self.scannedCode = nil
+                }
+            }
+        }
         
         let now = Date()
         if let lastTime = lastScanTime[code], now.timeIntervalSince(lastTime) < throttleInterval {

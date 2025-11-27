@@ -39,8 +39,10 @@ struct ScannerView: View {
                         .background(Color.green.opacity(0.9))
                         .cornerRadius(10)
                         .padding(.bottom, 50)
+                        .transition(.opacity)
                 }
             }
+            .animation(.easeInOut(duration: 0.5), value: viewModel.scannedCode)
         }
         .onAppear {
             isActive = true
