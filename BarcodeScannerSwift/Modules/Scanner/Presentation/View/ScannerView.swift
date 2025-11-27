@@ -20,6 +20,15 @@ struct ScannerView: View {
             .edgesIgnoringSafeArea(.all)
             
             VStack {
+                Text("ESCANEA EL CODIGO DE BARRAS O QR")
+                    .font(.subheadline)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(Color.gray.opacity(0.5))
+                    .cornerRadius(20)
+                    .padding(.top, 50)
+                
                 if let errorMessage = viewModel.errorMessage {
                     Text(errorMessage)
                         .foregroundColor(.white)
