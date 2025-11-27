@@ -13,7 +13,7 @@ struct HistoryView: View {
                         VStack(alignment: .leading) {
                             Text(item.code)
                                 .font(.headline)
-                            Text(item.type)
+                            Text(BarcodeTypeFormatter.format(item.type))
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
