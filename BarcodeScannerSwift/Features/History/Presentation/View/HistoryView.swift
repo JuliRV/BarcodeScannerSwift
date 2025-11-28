@@ -5,8 +5,10 @@ struct HistoryView: View {
     // @State hace que la vista sea dueña de este objeto (similar a viewModel() en Compose).
     @State var viewModel: HistoryViewModel
     
+    @EnvironmentObject var navigationManager: NavigationManager
+
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navigationManager.path) {
             List {
                 ForEach(viewModel.items) { item in
                     HStack {
@@ -45,6 +47,16 @@ struct HistoryView: View {
                 Button("OK", role: .cancel) { }
             } message: {
                 Text(viewModel.errorMessage ?? "")
+            }
+            // Definimos los destinos de navegación aquí o en el Manager si fuera posible, pero navigationDestination debe estar dentro del Stack
+            .navigationDestination(for: Route.self) { route in
+                switch route {
+                case .history:
+                    HistoryView(viewModel: viewModel) // O crear una nueva instancia si es necesario
+                case .scanner:
+                    // Placeholder o vista real
+                    Text("Scanner")
+                }
             }
         }
     }
